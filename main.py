@@ -16,11 +16,56 @@ OUTLINE_THICKNESS = 5
 BACKGROUND_COLOR = (205, 192, 180)
 FONT_COLOR = (119, 110, 101)
 
-FONT = pygame.font.SysFont("comicsans", 60, bold=True)
+FONT = pygame.font.SysFont("comicsans", 30, bold=True)
 MOVE_VEL = 20
 
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("2048")
+
+
+class Tile:
+    COLORS = [
+        (237, 229, 218),
+        (238, 225, 201),
+        (243, 225, 201),
+        (246, 150, 101),
+        (247, 124, 95),
+        (247, 95, 59),
+        (237, 208, 115),
+        (237, 204, 99),
+        (236, 202, 80),
+    ]
+
+    def __init__(self, value, row, col):
+        self.value = value
+        self.row = row
+        self.col = col
+        self.x = col * RECT_WIDTH
+        self.y = row * RECT_HEGHT
+
+    def get_color(self):
+        color_index = int(math.log2(self.value)) - 1
+        color = self.COLORS[color_index]
+        return color
+
+    def draw(self, window):
+        color = self.get_color()
+        pygame.draw.rect(window, color, (self.x, self.y, RECT_WIDTH, RECT_HEGHT))
+
+        text = FONT.render(str(self.value), 1, FONT_COLOR)
+        window.blit(
+            text,
+            (
+                self.x + (RECT_WIDTH / 2 - text.get_width() / 2),
+                self.y + (RECT_HEGHT / 2 - text.get_height() / 2),
+            ),
+        )
+
+    def set_pos(self):
+        pass
+
+    def move(self, delta):
+        pass
 
 
 def draw_grid(window):
@@ -35,8 +80,11 @@ def draw_grid(window):
     pygame.draw.rect(window, OUTLINE_COLOR, (0, 0, WIDTH, HEIGHT), OUTLINE_THICKNESS)
 
 
-def draw(window):
+def draw(window, tiles):
     window.fill(BACKGROUND_COLOR)
+    
+    for tile in tiles.values():
+        tile.draw(window)
 
     draw_grid(window)
     pygame.display.update()
@@ -46,6 +94,8 @@ def main(window):
     clock = pygame.time.Clock()
     run = True
 
+    tiles={}
+
     while run:
         clock.tick(FPS)
 
@@ -53,7 +103,7 @@ def main(window):
             if event.type == pygame.QUIT:
                 run = False
                 break
-        draw(window)
+        draw(window, tiles)
 
     pygame.quit()
 
